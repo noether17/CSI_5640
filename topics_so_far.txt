@@ -1,0 +1,7 @@
+TOPICS COVERED SO FAR
+
+PDF File: RISC-V Assembly Language Programming
+Sections: 2.1, 2.2, 2.3, 2.6, 2.7, 2.8 (p98-101)
+
+Additional: Example on page 102
+
