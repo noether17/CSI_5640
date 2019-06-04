@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ARRAY_SIZE 1073741824 // 2^30
-#define N_THREADS 8
+#define ARRAY_SIZE 262144
+#define N_THREADS 4
 
 struct thread_workload
 {
@@ -74,7 +74,7 @@ void* mult_func(void* v_workload)
 {
 	struct thread_workload* wl_p = (struct thread_workload*)v_workload;
 
-	printf("Thread #%d working on %d elements.\n", wl_p->index, wl_p->size);
+	// printf("Thread #%d working on %d elements.\n", wl_p->index, wl_p->size);
 
 	for (int i = 0; i < wl_p->size; ++i)
 		wl_p->c[i] = wl_p->a[i] * wl_p->b[i];
