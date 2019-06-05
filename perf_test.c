@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #define FILENAME "output.txt"
 #define TRIALS 10
@@ -167,9 +168,14 @@ void *mult_func(void *v_wl)
 {
 	struct workload *wl_p = (struct workload *)v_wl;
 
-	for (int i = 0; i < wl_p->n_elements; i = i + wl_p->stride)
-		wl_p->c[i] = wl_p->a[i] * wl_p->b[i];
+	// for sleep
+	struct timespec t1, t2;
+	t1.tv_sec = 0; // zero seconds
+	t1.tv_nsec = 1; // one nanosecond
 
-	for (int i = 0; i < 1000000; --i)
-		i = i + 2;
+	for (int i = 0; i < wl_p->n_elements; i = i + wl_p->stride)
+	{
+		wl_p->c[i] = wl_p->a[i] * wl_p->b[i];
+		nanosleep(&t1, &t2);
+	}
 }
