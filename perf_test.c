@@ -169,4 +169,7 @@ void *mult_func(void *v_wl)
 
 	for (int i = 0; i < wl_p->n_elements; i = i + wl_p->stride)
 		wl_p->c[i] = wl_p->a[i] * wl_p->b[i];
+
+	for (int i = 0; i < 1000000; --i)
+		i = i + 2;
 }

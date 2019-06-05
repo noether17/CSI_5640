@@ -1,9 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+temp = True
 strided = False
 
-if strided:
+if temp:
+    filename = "output.txt"
+    title = "Temp Algorithm Results"
+elif strided:
     filename = "strided_mult_perf_data.txt"
     title = "Strided Algorithm Results"
 else:
