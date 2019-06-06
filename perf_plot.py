@@ -14,9 +14,12 @@ else:
     filename = "contiguous_mult_perf_data.txt"
     title = "Contiguous Algorithm Results"
 
+filename = "cont_sleep_perf_data.txt"
+title = "Contiguous Algorithm with 1ns Sleep per Element"
+
 trials = 10 # number of trials per run
 max_threads = 16 # 1 - 16 threads
-array_sizes = 6 #19 # number of different sizes to test
+array_sizes = 13 #19 # number of different sizes to test
 start_power = 10 # first size is 2**10
 
 data = np.loadtxt(filename)[:max_threads * array_sizes, 1:] # exclude thread count
