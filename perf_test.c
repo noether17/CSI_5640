@@ -15,9 +15,10 @@
 #define FILENAME "output.txt"
 #define TRIALS 10
 #define MAX_THREADS 16
-#define MIN_SIZE 1024 // 2^10
-//#define MAX_SIZE 1048576 // 2^20 (for shorter tests)
-#define MAX_SIZE 268435456 // 2^28
+#define MIN_SIZE 16 // 2^4 (for shorter tests)
+//#define MIN_SIZE 1024 // 2^10
+#define MAX_SIZE 1048576 // 2^20 (for shorter tests)
+//#define MAX_SIZE 268435456 // 2^28
 
 #define A 2.f
 #define B 4.f
@@ -59,7 +60,7 @@ int main()
 	for (int size = MIN_SIZE; size <= MAX_SIZE; size = size * 2) // loop through array sizes
 	{
 		fprintf(fp, "## Array size = %d\n", size);
-		for (int threads = 1; threads <= MAX_THREADS; ++threads) // loop through # threads
+		for (int threads = 1; threads <= MAX_THREADS; threads = threads * 2) // loop through # threads
 		{
 			fprintf(fp, "%d", threads); // begin line with # threads
 			for (int trial = 0; trial < TRIALS; ++trial) // perform trials
@@ -171,7 +172,7 @@ void *mult_func(void *v_wl)
 	// for sleep
 	struct timespec t1, t2;
 	t1.tv_sec = 0; // zero seconds
-	t1.tv_nsec = 1; // one nanosecond
+	t1.tv_nsec = 1000000; // one millisecond
 
 	for (int i = 0; i < wl_p->n_elements; i = i + wl_p->stride)
 	{

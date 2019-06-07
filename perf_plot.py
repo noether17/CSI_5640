@@ -14,12 +14,12 @@ else:
     filename = "contiguous_mult_perf_data.txt"
     title = "Contiguous Algorithm Results"
 
-filename = "cont_sleep_perf_data.txt"
-title = "Contiguous Algorithm with 1ns Sleep per Element"
+filename = "cont_sleep1ms.txt"
+title = "Contiguous Algorithm with 1ms Sleep per Element"
 
 trials = 10 # number of trials per run
-max_threads = 16 # 1 - 16 threads
-array_sizes = 13 #19 # number of different sizes to test
+max_threads = 5 # 16 # 1 - 16 threads
+array_sizes = 11 #19 # number of different sizes to test
 start_power = 10 # first size is 2**10
 
 data = np.loadtxt(filename)[:max_threads * array_sizes, 1:] # exclude thread count
@@ -29,8 +29,12 @@ x = 2**np.arange(start_power, start_power + array_sizes)
 print(x)
 mean_values = np.mean(data, axis = 2)
 
-for i in 2**np.arange(5):
-    plt.loglog(x, mean_values[:, i - 1], label = "%d threads" % i)
+#for i in 2**np.arange(5):
+#    plt.loglog(x, mean_values[:, i - 1], label = "%d threads" % i)
+#    plt.title(title)
+
+for i in np.arange(max_threads):
+    plt.loglog(x, mean_values[:, i], label = "%d threads" % 2**i)
     plt.title(title)
 
 plt.xlabel("Number of 32-bit Array Elements")
