@@ -6,9 +6,12 @@
 void convolve(fftwf_complex *array, fftwf_complex *filter, int size,
 		fftwf_plan *forward, fftwf_plan *inverse);
 
+void print_complex_array(char *name, fftwf_complex *array, int size);
+
 int main()
 {
-	fftwf_complex *array, *filter; //array[ARRAY_SIZE], filter[ARRAY_SIZE];
+	// declare and initialize input array and filter
+	fftwf_complex *array, *filter;
 	array = (fftwf_complex*)fftwf_malloc(ARRAY_SIZE * sizeof(fftwf_complex));
 	filter = (fftwf_complex*)fftwf_malloc(ARRAY_SIZE * sizeof(fftwf_complex));
 	for (int i = 0; i < ARRAY_SIZE; ++i)
@@ -18,20 +21,19 @@ int main()
 	}
 	filter[0][0] = 1.0f;
 
+	// create forward and inverse fftw plans
 	fftwf_plan f_plan, i_plan;
 	f_plan = fftwf_plan_dft_1d(ARRAY_SIZE, array, array, FFTW_FORWARD, FFTW_ESTIMATE);
 	i_plan = fftwf_plan_dft_1d(ARRAY_SIZE, array, array, FFTW_BACKWARD, FFTW_ESTIMATE);
 
+	// do convolution
 	convolve(array, filter, ARRAY_SIZE, &f_plan, &i_plan);
 	
-	printf("Input Array:\n");
-	for (int i = 0; i < ARRAY_SIZE; ++i)
-		printf("index %d: %f + %fi\n", i, array[i][0], array[i][1]);
+	// print results
+	print_complex_array("Input Array", array, ARRAY_SIZE);
+	print_complex_array("Filter Array", filter, ARRAY_SIZE);
 
-	printf("Filter Array:\n");
-	for (int i = 0; i < ARRAY_SIZE; ++i)
-		printf("index %d: %f + %fi\n", i, filter[i][0], filter[i][1]);
-
+	// clean up
 	fftwf_destroy_plan(f_plan); fftwf_destroy_plan(i_plan);
 	fftwf_free(array); fftwf_free(filter);
 
@@ -54,4 +56,11 @@ void convolve(fftwf_complex *array, fftwf_complex *filter, int size,
 	}
 
 	fftwf_execute_dft(*inverse, array, array);
+}
+
+void print_complex_array(char *name, fftwf_complex *array, int size)
+{
+	printf("%s:\n", name);
+	for (int i = 0; i < size; ++i)
+		printf("index %d: %f + %fi\n", i, array[i][0], array[i][1]);
 }
