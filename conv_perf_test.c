@@ -39,15 +39,30 @@ int main()
 
 double execution_time(int array_size, int trial)
 {
+	/* this function measures execution time and checks correctness
+	 * of a function for performing FFT convolution using FFTW.
+	 * the filter used for convolution has an initial element of
+	 * 1.0 + 0.0i followed by all zeros. this choice was made so that
+	 * correctness can be checked by comparing the output array to a
+	 * copy of the input array.
+	 */
+
 	// announce start of trial set
 	if (trial == 0)
 		printf("%d array elements", array_size);
 
-	// allocate and initialize arrays
+	// allocate arrays
 	fftwf_complex *input, *filter, *comparison;
 	input = (fftwf_complex *)fftwf_malloc(array_size * sizeof(fftwf_complex));
 	filter = (fftwf_complex *)fftwf_malloc(array_size * sizeof(fftwf_complex));
 	comparison = (fftwf_complex *)fftwf_malloc(array_size * sizeof(fftwf_complex));
+
+	// create forward and inverse fftw plans
+	fftwf_plan f_plan, i_plan;
+	f_plan = fftwf_plan_dft_1d(array_size, input, input, FFTW_FORWARD, FFTW_MEASURE);
+	i_plan = fftwf_plan_dft_1d(array_size, input, input, FFTW_BACKWARD, FFTW_MEASURE);
+
+	// initialize arrays (must occur after plans are created)
 	for (int i = 0; i < array_size; ++i)
 	{
 		input[i][0] = comparison[i][0] = (float)i;
@@ -55,12 +70,7 @@ double execution_time(int array_size, int trial)
 
 		filter[i][0] = filter[i][1] = 0.0f;
 	}
-	filter[0][0] = 1.0f;
-
-	// create forward and inverse fftw plans
-	fftwf_plan f_plan, i_plan;
-	f_plan = fftwf_plan_dft_1d(array_size, input, input, FFTW_FORWARD, FFTW_MEASURE);
-	i_plan = fftwf_plan_dft_1d(array_size, input, input, FFTW_BACKWARD, FFTW_MEASURE);
+	filter[0][0] = 1.0f / array_size;
 
 	// measure execution time of convolution
 	clock_t start, end;
@@ -71,6 +81,13 @@ double execution_time(int array_size, int trial)
 
 	// check max error and print results
 	float max_error = 0.0f, current_error = 0.0f;
+	for (int i = 0; i < array_size; ++i)
+	{
+		current_error = fabsf(input[i][0] - comparison[i][0]);
+		current_error += fabsf(input[i][1] - comparison[i][1]);
+		if (current_error > max_error)
+			max_error = current_error;
+	}
 	printf(" max error: %f;", max_error);
 	if (trial == TRIALS - 1)
 		printf("\n");
@@ -88,6 +105,13 @@ double execution_time(int array_size, int trial)
 void convolve(fftwf_complex *input, fftwf_complex *filter, int size,
 		fftwf_plan *forward, fftwf_plan *inverse)
 {
+	fftwf_execute_dft(*forward, input, input);
+	fftwf_execute_dft(*forward, filter, filter);
+
+	for (int i = 0; i < size; ++i)
+		mult_inplace(input[i], filter[i]);
+
+	fftwf_execute_dft(*inverse, input, input);
 }
 
 void mult(fftwf_complex z, fftwf_complex x, fftwf_complex y)
