@@ -6,7 +6,8 @@
 #define FILENAME "conv_out.txt"
 #define TRIALS 10
 #define MIN_SIZE 1024 // 2^10
-#define MAX_SIZE 1048576 // 2^20
+//#define MAX_SIZE 1048576 // 2^20
+#define MAX_SIZE 33554432 // 2^25
 
 double execution_time(int array_size, int trial);
 
