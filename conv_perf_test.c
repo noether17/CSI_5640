@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <time.h>
 
-#define FILENAME "conv_out.txt"
+#define FILENAME "cpu_convolution_performance_results.txt"
 #define TRIALS 10
 #define MIN_SIZE 1024 // 2^10
-//#define MAX_SIZE 1048576 // 2^20
-#define MAX_SIZE 33554432 // 2^25
+//#define MAX_SIZE 1048576 // 2^20 (for shorter tests)
+#define MAX_SIZE 268435456 // 2^28
 
 double execution_time(int array_size, int trial);
 
 void convolve(fftwf_complex *input, fftwf_complex *filter, int size,
 		fftwf_plan *forward, fftwf_plan *inverse);
 
-void mult(fftwf_complex z, fftwf_complex x, fftwf_complex y);
+void array_mult_inplace(fftwf_complex *x, fftwf_complex *y, int size);
 
-void mult_inplace(fftwf_complex x, fftwf_complex y);
+float error(fftwf_complex x, fftwf_complex x0);
 
 int main()
 {
@@ -40,7 +40,8 @@ int main()
 
 double execution_time(int array_size, int trial)
 {
-	/* this function measures execution time and checks correctness
+	/*
+	 * this function measures execution time and checks correctness
 	 * of a function for performing FFT convolution using FFTW.
 	 * the filter used for convolution has an initial element of
 	 * 1.0 + 0.0i followed by all zeros. this choice was made so that
@@ -66,11 +67,15 @@ double execution_time(int array_size, int trial)
 	// initialize arrays (must occur after plans are created)
 	for (int i = 0; i < array_size; ++i)
 	{
+		// input and comparison initialized with same values
 		input[i][0] = comparison[i][0] = (float)i;
 		input[i][1] = comparison[i][1] = 0.0f;
 
+		// filter initialized with all zeros
 		filter[i][0] = filter[i][1] = 0.0f;
 	}
+	// initialize first element as 1.0 + 0.0i
+	// (divide by array_size for normalization)
 	filter[0][0] = 1.0f / array_size;
 
 	// measure execution time of convolution
@@ -84,8 +89,7 @@ double execution_time(int array_size, int trial)
 	float max_error = 0.0f, current_error = 0.0f;
 	for (int i = 0; i < array_size; ++i)
 	{
-		current_error = fabsf(input[i][0] - comparison[i][0]);
-		current_error += fabsf(input[i][1] - comparison[i][1]);
+		current_error = error(input[i], comparison[i]);
 		if (current_error > max_error)
 			max_error = current_error;
 	}
@@ -106,24 +110,41 @@ double execution_time(int array_size, int trial)
 void convolve(fftwf_complex *input, fftwf_complex *filter, int size,
 		fftwf_plan *forward, fftwf_plan *inverse)
 {
+	// forward Fourier transform input and filter
 	fftwf_execute_dft(*forward, input, input);
 	fftwf_execute_dft(*forward, filter, filter);
 
-	for (int i = 0; i < size; ++i)
-		mult_inplace(input[i], filter[i]);
+	// multiply transformed arrays element-wise
+	array_mult_inplace(input, filter, size);
 
+	// inverse Fourier transform on product array
 	fftwf_execute_dft(*inverse, input, input);
 }
 
-void mult(fftwf_complex z, fftwf_complex x, fftwf_complex y)
+void array_mult_inplace(fftwf_complex *z1, fftwf_complex *z2, int size)
 {
-	z[0] = x[0] * y[0] - x[1] * y[1];
-	z[1] = x[0] * y[1] + x[1] * y[0];
+	for (int i = 0; i < size; ++i)
+	{
+		float x1, y1, x2, y2, tx, ty;
+
+		x1 = z1[i][0];
+		y1 = z1[i][1];
+		x2 = z2[i][0];
+		y2 = z2[i][1];
+
+		tx = x1 * x2 - y1 * y2;
+		ty = x1 * y2 + y1 * x2;
+
+		z1[i][0] = tx;
+		z1[i][1] = ty;
+	}
 }
 
-void mult_inplace(fftwf_complex x, fftwf_complex y)
+float error(fftwf_complex z, fftwf_complex z0)
 {
-	fftwf_complex z;
-	mult(z, x, y);
-	x[0] = z[0]; x[1] = z[1];
+	float dx, dy;
+	dx = z[0] - z0[0];
+	dy = z[1] - z0[1];
+
+	return sqrtf(dx * dx + dy * dy);
 }
