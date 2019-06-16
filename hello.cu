@@ -18,19 +18,29 @@ int main()
 	cuda_hello<<<1, 1>>>();
 	printf("Hello world from host\n");
 
-	// float a[N], b[N], out[N];
-	float *a, *b, *out;
-	cudaMalloc((void **)&a, sizeof(float) * N);
-	cudaMalloc((void **)&b, sizeof(float) * N);
-	cudaMalloc((void **)&out, sizeof(float) * N);
+	float a[N], b[N], out[N];
+	float *dev_a, *dev_b, *dev_out;
+
+	cudaMalloc((void **)&dev_a, N * sizeof(float));
+	cudaMalloc((void **)&dev_b, N * sizeof(float));
+	cudaMalloc((void **)&dev_out, N * sizeof(float));
 
 	for (int i = 0; i < N; ++i)
 		a[i] = b[i] = i;
 
-	vector_add<<<1, 1>>>(out, a, b, N);
+	cudaMemcpy(dev_a, a, N * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_b, b, N * sizeof(float), cudaMemcpyHostToDevice);
+
+	vector_add<<<1, 1>>>(dev_out, dev_a, dev_b, N);
+
+	cudaMemcpy(out, dev_out, N * sizeof(float), cudaMemcpyDeviceToHost);
 
 	for (int i = 0; i < N; ++i)
 		printf("%f + %f = %f\n", a[i], b[i], out[i]);
+
+	cudaFree(dev_a);
+	cudaFree(dev_b);
+	cudaFree(dev_out);
 
 	return 0;
 }
