@@ -8,7 +8,7 @@
 #define MIN_SIZE 1024 // 2^10
 #define MAX_SIZE 268435456 // 2^28
 #define BATCH 1 // batches in CUFFT plan
-#define BLOCK_SIZE 64 // number of threads in a block
+#define BLOCK_SIZE 128 // number of threads in a block
 
 double execution_time(int array_size, int trial);
 
