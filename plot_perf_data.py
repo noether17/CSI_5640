@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 # load data
 cpu_sizes = np.loadtxt("cpu_convolution_performance_results.txt")[:, 0]
 cpu_times = np.loadtxt("cpu_convolution_performance_results.txt")[:, 1:]
-gpu_sizes = np.loadtxt("gpu_convolution_performance_results.txt")[:, 0]
-gpu_times = np.loadtxt("gpu_convolution_performance_results.txt")[:, 1:]
+gpu_sizes = np.loadtxt("gpu_convolution_performance_results_tpb128.txt")[:, 0]
+gpu_times = np.loadtxt("gpu_convolution_performance_results_tpb128.txt")[:, 1:]
 
 # calculate average times
 cpu_times = np.mean(cpu_times, axis = 1)
