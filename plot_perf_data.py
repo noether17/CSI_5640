@@ -11,6 +11,9 @@ gpu_times = np.loadtxt("gpu_convolution_performance_results.txt")[:, 1:]
 cpu_times = np.mean(cpu_times, axis = 1)
 gpu_times = np.mean(gpu_times, axis = 1)
 
+#print gpu speedup values
+print(cpu_times / gpu_times)
+
 #plot
 plt.loglog(cpu_sizes, cpu_times, label="i9 9900K")
 plt.loglog(gpu_sizes, gpu_times, label="GTX 1070")
