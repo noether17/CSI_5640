@@ -10,7 +10,7 @@
  * correctly.
  *
  * compile with gcc and link 32-bit FFTW library
- * with -lfftw3f -lm
+ * and math library with -lfftw3f -lm
  */
 #include <fftw3.h>
 #include <math.h>
