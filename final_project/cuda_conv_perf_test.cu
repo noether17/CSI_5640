@@ -1,3 +1,17 @@
+/*
+ * This program measures execution times for 
+ * cuFFT convolution for array sizes of 2^N
+ * between MIN_SIZE and MAX_SIZE and saves the 
+ * data to FILENAME in a format that can be
+ * easily read using NumPy. During execution,
+ * progress is printed to standard output, along
+ * with a measurement of the maximum error to 
+ * ensure the computation is being performed 
+ * correctly.
+ * 
+ * compile using nvcc and link cuFFT with
+ * -lcufft 
+ */
 #include <cufft.h>
 #include <math.h>
 #include <stdio.h>

@@ -1,3 +1,17 @@
+/*
+ * This program measures execution times for 
+ * FFTW convolution for array sizes of 2^N
+ * between MIN_SIZE and MAX_SIZE and saves the 
+ * data to FILENAME in a format that can be
+ * easily read using NumPy. During execution,
+ * progress is printed to standard output, along
+ * with a measurement of the maximum error to 
+ * ensure the computation is being performed 
+ * correctly.
+ *
+ * compile with gcc and link 32-bit FFTW library
+ * with -lfftw3f -lm
+ */
 #include <fftw3.h>
 #include <math.h>
 #include <stdio.h>
